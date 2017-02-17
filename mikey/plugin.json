@@ -1,0 +1,10 @@
+{
+  "plugin": {
+	"name": "mikey",
+	"description": "Allows external programs play mame (targeting robotron)",
+	"version": "0.0.1",
+	"author": "bzztbomb",
+	"type": "plugin",
+	"start": "false"
+  }
+}
