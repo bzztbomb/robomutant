@@ -54,6 +54,8 @@ python play.py
 ./mame64 -plugins -plugin mikey robotron
 `
 
+Useful code in tensortron is in utils.py, parse a MAME INP file
+
 Based on
 ========
 * TensorKart -- https://github.com/kevinhughes27/TensorKart

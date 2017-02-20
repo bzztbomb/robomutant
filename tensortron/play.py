@@ -3,14 +3,18 @@ import model
 import os.path
 import matplotlib.pyplot as plt
 
-def port_to_moves(portname, fieldnames, portval):
-  result = []
-  bit_to_check = 1
-  for field in fieldnames:
-    output = portname + "," + field + "," + str(1 if (portval & bit_to_check) else 0) + "\n"
-    result.append(output)
-    bit_to_check = bit_to_check << 1
-  return result
+threshold = 0.7
+
+def axis_to_moves(portname, fieldnames, axisval):
+  retvalues = [0, 0]
+  if (axisval < -threshold):
+    retvalues[0] = 1
+  if (axisval > threshold):
+    retvalues[1] = 1
+  lines = []
+  for i in range(2):
+    lines.append(portname + "," + fieldnames[i] + "," + str(retvalues[i]))
+  return lines
 
 snap_dir = "/Users/bzztbomb/projects/mame/snap/robotron"
 screenshot = os.path.join(snap_dir, "current_frame.png")
@@ -31,22 +35,30 @@ while True:
   while (image == None):
     try:
       image = plt.imread(screenshot)
+      print (image.shape)
     except:
       pass
   # Think
   output = model.y.eval(feed_dict={model.x: [image], model.keep_prob: 1.0})
   # Act
-  (port0, port1) = output[0]
-  port0 = int(port0)
-  port1 = int(port1)
+  (moveupdown, moveleftright, fireupdown, fireleftright, start) = output[0]
   lines = []
-  lines.extend(port_to_moves(":IN0", ["Move Up", "Move Down", "Move Left", "Move Right", "1 Player Start", "2 Players Start", "Fire Up", "Fire Down"], port0))
-  lines.extend(port_to_moves(":IN1", ["Fire Left", "Fire Right"], port1))
+  # lines.extend(port_to_moves(":IN0", ["Move Up", "Move Down", "Move Left", "Move Right", "1 Player Start", "2 Players Start", "Fire Up", "Fire Down"], port0))
+  # lines.extend(port_to_moves(":IN1", ["Fire Left", "Fire Right"], port1))
+  lines.extend(axis_to_moves(":IN0", ["Move Down", "Move Up"], moveupdown))
+  lines.extend(axis_to_moves(":IN0", ["Move Left", "Move Right"], moveleftright))
+  lines.extend(axis_to_moves(":IN0", ["Fire Down", "Fire Up"], fireupdown))
+  lines.extend(axis_to_moves(":IN1", ["Fire Left", "Fire Right"], fireleftright))
+  # lines.append(":IN0,1 Player Start," + "1" if start > threshold else "0")
+
+  print((moveupdown, moveleftright, fireupdown, fireleftright, start))
+  print("\n")
   print(lines)
   print("\n")
   f = open(moves + ".tmp", "w")
   for line in lines:
     f.write(line)
+    f.write("\n")
   f.close()
   os.rename(moves + ".tmp", moves)
   os.remove(screenshot)

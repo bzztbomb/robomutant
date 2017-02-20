@@ -21,24 +21,27 @@ sess.run(tf.global_variables_initializer())
 logs_path = './logs'
 summary_writer = tf.train.SummaryWriter(logs_path, graph=tf.get_default_graph())
 
+tf.scalar_summary("loss", loss)
+merged_summary_op = tf.summary.merge_all()
+
 # Training loop variables
 epochs = 100
 batch_size = 50
 num_samples = data.num_examples
 step_size = int(num_samples / batch_size)
+saver = tf.train.Saver()
 
 for epoch in range(epochs):
     for i in range(step_size):
-        batch = data.next_batch(100)
-        print(batch[1].shape)
-        print(model.y.get_shape())
-        print(model.y_.get_shape())
+        batch = data.next_batch(batch_size)
         train_step.run(feed_dict={model.x: batch[0], model.y_: batch[1], model.keep_prob: 0.8})
 
         # if i%10 == 0:
         loss_value = loss.eval(feed_dict={model.x:batch[0], model.y_: batch[1], model.keep_prob: 1.0})
         print("epoch: %d step: %d loss: %g"%(epoch, epoch * batch_size + i, loss_value))
 
-# Save the Model
-saver = tf.train.Saver()
-saver.save(sess, "model.ckpt")
+        summary = merged_summary_op.eval(feed_dict={model.x:batch[0], model.y_: batch[1], model.keep_prob: 1.0})
+        summary_writer.add_summary(summary, epoch * batch_size + i)
+    # Save the Model
+    saver.save(sess, "model.ckpt")
+    print("model saved")

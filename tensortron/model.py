@@ -2,7 +2,7 @@ import tensorflow as tf
 
 IMG_W = 292
 IMG_H = 240
-OUT_SHAPE = 2
+OUT_SHAPE = 5 # move left/right (-1..1), move down/up (-1..1), fire left/right (-1..1), fire down/up(-1..1), start
 
 def weight_variable(shape):
   initial = tf.truncated_normal(shape, stddev=0.1)

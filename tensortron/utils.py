@@ -5,13 +5,13 @@ import numpy
 
 class Data(object):
     def __init__(self):
-        filename = '/Users/bzztbomb/projects/mame/snap/bob.avi'
+        filename = '/Users/bzztbomb/projects/mame/snap/movie.avi'
         self._vid = imageio.get_reader(filename, 'ffmpeg')
         self._videocount = 0
         for _ in self._vid:
             self._videocount += 1
 
-        inp_file = '/Users/bzztbomb/projects/mame/inp/inputs4'
+        inp_file = '/Users/bzztbomb/projects/mame/inp/moves'
         data = open(inp_file, "rb").read()
         magic = struct.Struct('q').unpack(b'MAMEINP\x00')[0]
         header_struct = struct.Struct('=qqbbH12s32s')
@@ -28,13 +28,29 @@ class Data(object):
         for i in range(totalMoves):
             (seconds, attoseconds, machine_speed, port0_def, port0_value, port1_def, port1_value, port2_def, port2_value) = record_struct.unpack(moves[begin:begin+moveSize])
             begin = begin + moveSize
-            self._moves.append((port0_value, port1_value))
+
+            move_updown = self.port_to_axis(port0_value, 0x2, 0x1)
+            move_leftright = self.port_to_axis(port0_value, 0x4, 0x8)
+            fire_updown = self.port_to_axis(port0_value, 0x80, 0x40)
+            fire_leftright = self.port_to_axis(port1_value, 0x1, 0x2)
+            start = self.port_to_axis(port0_value, 0x100000, 0x10)
+
+            self._moves.append((move_updown, move_leftright, fire_updown, fire_leftright, start))
         self._epochs_completed = 0
         self._index_in_epoch = 0
+        print ("INP moves: " + str(totalMoves))
+        print ("VIDEO frames: " + str(self._videocount))
         if (totalMoves < self._videocount):
             self._num_examples = totalMoves
         else:
             self._num_examples = self._videocount
+
+    def port_to_axis(self, portval, low, high):
+        if (portval & low):
+            return -1
+        if (portval & high):
+            return 1
+        return 0
 
     @property
     def num_examples(self):
