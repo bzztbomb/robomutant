@@ -6,7 +6,7 @@ Robomutant is made up of two pieces.  Mikey is an interface between external cod
 
 MIKEY
 =====
-This is a a MAME lua plugin that allows for external programs to see the framebuffer of a game and deliver input to mame. There are two modes, blocking and non-blocking.  Blocking mode will wait for input before allow the game to advance to the next frame.  Non-blocking will just take input as it is fed.  Turn blocking mode on by setting
+This is a a MAME LUA plugin that allows for external programs to see the framebuffer of a game and deliver input to mame. There are two modes, blocking and non-blocking.  Blocking mode will wait for input before allow the game to advance to the next frame.  Non-blocking will just take input as it is fed.  Turn blocking mode on by setting
 `
 local block_until_processed = true
 `
@@ -35,8 +35,14 @@ Input moves is a csv file that contains port, fieldname, and value. Here's an ex
 :IN1,Fire Right,0
 `
 
+DADDY
+=====
+
+Daddy generates random moves every frame. It makes sure MIKEY is doing his job. Run with a pretty vanilla python.
+
 TENSORTRON
 ==========
+An attempt at DEEP LEARNING bot. Not working yet.
 
 `
 # Record input movesand video
