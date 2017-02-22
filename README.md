@@ -40,6 +40,10 @@ DADDY
 
 Daddy generates random moves every frame. It makes sure MIKEY is doing his job. Run with a pretty vanilla python.
 
+MOMMY
+=====
+OpenCV bot that uses blob detection.  Can get to level 3 reliably at the moment.  More improvements coming!
+
 TENSORTRON
 ==========
 An attempt at DEEP LEARNING bot. Not working yet.
