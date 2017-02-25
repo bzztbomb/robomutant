@@ -89,20 +89,30 @@ while True:
     if (video != None):
       video.write(im_with_keypoints)
 
-    keypoints = sorted(keypoints, key=lambda kp: math.hypot(kp.pt[0] - savior_loc[0], kp.pt[1] - savior_loc[1]))
-    kp = keypoints[1 if len(keypoints) > 1 else 0]
-    print("kp: " + str(kp.pt))
+    # Convert keypoints to tuples
+    pts = []
+    for kp in keypoints:
+      pts.append((kp.pt[0], kp.pt[1]))
+    height, width, channels = image.shape
+    # Treat corners as enemies
+    pts.append((0,0))
+    pts.append((0,height))
+    pts.append((width,height))
+    pts.append((width,0))
+    pts = sorted(pts, key=lambda kp: math.hypot(kp[0] - savior_loc[0], kp[1] - savior_loc[1]))
+    kp = pts[1 if len(pt) > 1 else 0]
+    print("kp: " + str(kp))
     print("savior: " + str(savior_loc))
     x_index = 0
     y_index = 1
-    movedownup = 1 if kp.pt[y_index] > savior_loc[y_index] else -1
-    moveleftright = -1 if kp.pt[x_index] > savior_loc[x_index] else 1
+    movedownup = 1 if kp[y_index] > savior_loc[y_index] else -1
+    moveleftright = -1 if kp[x_index] > savior_loc[x_index] else 1
     firethresh = 15
-    if abs(kp.pt[y_index] - savior_loc[y_index]) > firethresh:
+    if abs(kp[y_index] - savior_loc[y_index]) > firethresh:
       fireupdown = -movedownup
     else:
       fireupdown = 0
-    if (abs(kp.pt[x_index] - savior_loc[x_index]) > firethresh) or (fireupdown == 0):
+    if (abs(kp[x_index] - savior_loc[x_index]) > firethresh) or (fireupdown == 0):
       fireleftright = -moveleftright
     else:
       fireleftright = 0
